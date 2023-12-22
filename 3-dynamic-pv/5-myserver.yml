@@ -1,0 +1,47 @@
+kind: Deployment
+#apiVersion: extensions/v1beta1
+apiVersion: apps/v1
+metadata:
+  labels:
+    app: myserver-myapp
+  name: myserver-myapp-deployment-name
+  namespace: myserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myserver-myapp-frontend
+  template:
+    metadata:
+      labels:
+        app: myserver-myapp-frontend
+    spec:
+      containers:
+        - name: myserver-myapp-container
+          image: nginx:1.20.0
+          #imagePullPolicy: Always
+          volumeMounts:
+          - mountPath: "/usr/share/nginx/html/statics"
+            name: statics-datadir
+      volumes:
+        - name: statics-datadir
+          persistentVolumeClaim:
+            claimName: myserver-myapp-dynamic-pvc
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: myserver-myapp-service
+  name: myserver-myapp-service-name
+  namespace: myserver
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30010
+  selector:
+    app: myserver-myapp-frontend

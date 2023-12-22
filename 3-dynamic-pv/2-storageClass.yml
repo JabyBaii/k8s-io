@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: managed-nfs-storage
+provisioner: k8s-sigs.io/nfs-subdir-external-provisioner # or choose another name, must match deployment's env PROVISIONER_NAME'
+reclaimPolicy: Retain #PV的删除策略，默认为delete，删除PV后立即删除NFS server的数据
+mountOptions:
+  #- vers=4.1 #containerd有部分参数异常
+  #- noresvport #告知NFS客户端在重新建立网络连接时，使用新的传输控制协议源端口
+  - noatime #访问文件时不更新文件inode中的时间戳，高并发环境可提高性能
+parameters:
+  #mountOptions: "vers=4.1,noresvport,noatime"
+  archiveOnDelete: "true"  #删除pod时保留pod数据，默认为false时为不保留数据

@@ -1,0 +1,13 @@
+# Test PVC
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myserver-myapp-dynamic-pvc
+  namespace: myserver
+spec:
+  storageClassName: managed-nfs-storage #调用的storageclass 名称
+  accessModes:
+    - ReadWriteMany #访问权限
+  resources:
+    requests:
+      storage: 500Mi #空间大小
